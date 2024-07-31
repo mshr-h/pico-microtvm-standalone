@@ -1,11 +1,12 @@
 import argparse
 import os
+import logging
 from tvm import relay
 import tvm
-from tvm import runtime
-import logging
+from tvm import runtime as tvm_runtime
+from tvm.relay.backend import Runtime
 
-def build_model_add(opts):
+def build_model_add(opts: argparse.Namespace):
     import onnx
     onnx_path = opts.model
     onnx_model = onnx.load(onnx_path)
@@ -15,11 +16,11 @@ def build_model_add(opts):
     shape_dict = {input1_name: [1], input2_name: [1]}
     mod, params = relay.frontend.from_onnx(onnx_model, shape_dict)
 
-    runtime_name = "c"
+    runtime = Runtime("crt", {"system-lib": True})
     file_format_str = "{name}_c.{ext}"
     with tvm.transform.PassContext(opt_level=3, config={"tir.disable_vectorize": True}):
         lib = relay.build(
-            mod, f"c --runtime={runtime_name} --system-lib --link-params", params=params
+            mod, "c", runtime=runtime, params=params
         )
 
     build_dir = os.path.abspath(opts.out_dir)
@@ -36,7 +37,7 @@ def build_model_add(opts):
     with open(
         os.path.join(build_dir, file_format_str.format(name="params", ext="bin")), "wb"
     ) as f_params:
-        f_params.write(runtime.save_param_dict(lib.get_params()))
+        f_params.write(tvm_runtime.save_param_dict(lib.get_params()))
 
 
 if __name__ == "__main__":

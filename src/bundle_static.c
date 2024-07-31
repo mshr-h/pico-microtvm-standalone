@@ -27,11 +27,11 @@
 #include <unistd.h>
 
 #ifdef ENABLE_TVM_PLATFORM_ABORT_BACKTRACE
-#include <backtrace.h>
+#include "backtrace.h"
 #endif
 #include "bundle.h"
 
-#define CRT_MEMORY_NUM_PAGES 48 // changed from 16384
+#define CRT_MEMORY_NUM_PAGES 48
 #define CRT_MEMORY_PAGE_SIZE_LOG2 10
 
 static uint8_t g_crt_memory[CRT_MEMORY_NUM_PAGES * (1 << CRT_MEMORY_PAGE_SIZE_LOG2)];
@@ -72,14 +72,7 @@ TVM_DLL void* tvm_runtime_create(const char* json_data, const char* params_data,
   TVM_CCALL(TVMPackedFunc_InitGlobalFunc(&pf, "runtime.SystemLib", &args));
   TVM_CCALL(TVMPackedFunc_Call(&pf));
 
-  if (0 >= (&pf.ret_value)->values_count) {
-    TVMPlatformAbort(-1);
-  }
-  if ((&pf.ret_value)->tcodes[0] != kTVMModuleHandle) {
-    TVMPlatformAbort(-1);
-  }
-
-  TVMModuleHandle mod_syslib = (&pf.ret_value)->values[0].v_handle;
+  TVMModuleHandle mod_syslib = TVMArgs_AsModuleHandle(&pf.ret_value, 0);
 
   // run modules
   TVMGraphExecutor* graph_executor = NULL;

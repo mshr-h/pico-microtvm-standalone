@@ -1,0 +1,26 @@
+diff --git a/src/bundle_static.c b/src/bundle_static.c
+index 18a7b2b..a55c308 100644
+--- a/src/bundle_static.c
++++ b/src/bundle_static.c
+@@ -31,7 +31,7 @@
+ #endif
+ #include "bundle.h"
+ 
+-#define CRT_MEMORY_NUM_PAGES 16384
++#define CRT_MEMORY_NUM_PAGES 48
+ #define CRT_MEMORY_PAGE_SIZE_LOG2 10
+ 
+ static uint8_t g_crt_memory[CRT_MEMORY_NUM_PAGES * (1 << CRT_MEMORY_PAGE_SIZE_LOG2)];
+diff --git a/src/tvm/standalone_crt/src/runtime/crt/common/crt_backend_api.c b/src/tvm/standalone_crt/src/runtime/crt/common/crt_backend_api.c
+index 56bbbed..8dfa0db 100644
+--- a/src/tvm/standalone_crt/src/runtime/crt/common/crt_backend_api.c
++++ b/src/tvm/standalone_crt/src/runtime/crt/common/crt_backend_api.c
+@@ -40,7 +40,7 @@ void* TVMBackendAllocWorkspace(int device_type, int device_id, uint64_t nbytes,
+   assert(nbytes > 0);
+   err = TVMPlatformMemoryAllocate(nbytes, dev, &ptr);
+   CHECK_EQ(err, kTvmErrorNoError,
+-           "TVMBackendAllocWorkspace(%d, %d, %" PRIu64 ", %d, %d) -> %" PRId32, device_type,
++           "TVMBackendAllocWorkspace(%d, %d, %u, %d, %d) -> %" PRId32, device_type,
+            device_id, nbytes, dtype_code_hint, dtype_bits_hint, err);
+   return ptr;
+ }

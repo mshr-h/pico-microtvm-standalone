@@ -1,34 +1,12 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
 /build
+/3rdparty/tvm
+/src/tvm
+
+lib0.c
+lib1.c
+devc.c
+graph_c.json
+graph_c.json.c
+model_c.tar
+params_c.bin
+params_c.bin.c

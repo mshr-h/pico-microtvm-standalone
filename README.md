@@ -2,7 +2,11 @@
 
 This is a very basic microTVM example for Raspberry Pi Pico.
 
-## Getting Started (Example for Ubuntu 20.04)
+- TVM v0.17
+- Ubuntu 24.04
+- Python 3.12
+
+## Getting Started (Example for Ubuntu 24.04)
 
 Install CMake and cross compiler.
 
@@ -15,6 +19,22 @@ Clone the repository.
 ```bash
 git clone https://github.com/mshr-h/pico-microtvm-standalone
 cd pico-microtvm-standalone
+```
+
+Create python virtual env and install python dependencies.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Build and install TVM from source.
+
+```bash
+cd 3rdparty
+./build-tvm.sh
+cd ..
 ```
 
 Build model with TVM.
@@ -40,20 +60,25 @@ xxd -i params_c.bin > params_c.bin.c
 - `lib1.c`
   - Compiled operators
 
-Create build directory.
+Copy the TVM runtime files from 3rdparty/tvm
 
 ```bash
-mkdir build
-cd build
+./copy-tvm-crt.sh
+```
+
+Fix some errors before building the code.
+
+```bash
+patch -p1 < diff.patch
 ```
 
 Configure and build it.
 
-If `PICO_SDK_PATH` environment variable isn't set, cmake will automatically download [pico-sdk](https://github.com/raspberrypi/pico-sdk) to the `build` directory.
+If `PICO_SDK_PATH` environment variable isn't set, cmake will automatically download [pico-sdk](https://github.com/raspberrypi/pico-sdk) to the `build/_dep` directory.
 
 ```bash
-cmake ..
-make -j`nproc`
+cmake -S . -B build -G Ninja
+cmake --build build
 ```
 
 Connect the Pico to the Host PC with pressing the BOOTSEL button.
